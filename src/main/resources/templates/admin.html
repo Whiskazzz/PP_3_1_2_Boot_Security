@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<link rel="shortcut icon" type="image/ico" th:href="@{favicon.ico}"/>
+<html lang="en"  xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+</head>
+
+<form th:method="post" th:action="@{/admin}" th:object="${user}">
+
+    <label for="name">Name</label>
+    <input name="name" type="text" th:field="*{name}" id="name"/>
+
+    <label for="surname">Surname</label>
+    <input name="surname" type="text" th:field="*{surname}" id="surname"/>
+
+    <label for="email">Email</label>
+    <input name="email" type="text" th:field="*{email}" id="email"/>
+
+    <br>
+    <input type="submit" value="Add user">
+</form>
+
+<br>
+
+<form th:method="patch" th:action="@{/admin}" th:object="${user}">
+    <label for="idp">ID</label>
+    <input name="id" type="number" id="idp"/>
+
+    <label for="namep">Name</label>
+    <input name="name" type="text" th:field="*{name}" id="namep"/>
+
+    <label for="surnamep">Surname</label>
+    <input name="surname" type="text" th:field="*{surname}" id="surnamep"/>
+
+    <label for="emailp">Email</label>
+    <input name="email" type="text" th:field="*{email}" id="emailp"/>
+
+    <br>
+    <input type="submit" value="Change user">
+</form>
+
+<br>
+
+<form th:method="delete" name="delete" th:action="@{/admin}">
+    <label for="id">ID</label>
+    <input name="id" type="number" id="id"/>
+    <br>
+    <input type="submit" value="Delete user">
+</form>
+<table>
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Surname</th>
+        <th>Email</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.getId}"></td>
+        <td th:text="${user.getName}"></td>
+        <td th:text="${user.getSurname}"></td>
+        <td th:text="${user.getEmail}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<br>
+<br>
+<form th:action="@{/logout}" method="post">
+    <button type="submit">Sign Out</button>
+</form>
+
+
+
+</html>
