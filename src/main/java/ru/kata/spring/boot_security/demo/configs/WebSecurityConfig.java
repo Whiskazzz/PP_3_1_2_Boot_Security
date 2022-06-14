@@ -4,40 +4,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.DefaultRedirectStrategy;
-import org.springframework.security.web.RedirectStrategy;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import ru.kata.spring.boot_security.demo.service.UserService;
-import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Collection;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    private final MyAuthenticationSuccessHandler successUserHandler;
+    private final SuccessUserHandler successUserHandler;
 
     @Autowired
     private UserService userService;
 
 
     public WebSecurityConfig(SuccessUserHandler successUserHandler) {
-        this.successUserHandler = new MyAuthenticationSuccessHandler();
+        this.successUserHandler = successUserHandler;
     }
 
     @Override
@@ -55,19 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll();
     }
 
-    // аутентификация inMemory
-//    @Bean
-//    @Override
-//    public UserDetailsService userDetailsService() {
-//        UserDetails user =
-//                User.withDefaultPasswordEncoder()
-//                        .username("user")
-//                        .password("user")
-//                        .roles("USER")
-//                        .build();
-//
-//        return new InMemoryUserDetailsManager(user);
-//    }
+
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
@@ -75,36 +48,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         authenticationProvider.setPasswordEncoder(new BCryptPasswordEncoder());
         return authenticationProvider;
     }
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        auth
+                .inMemoryAuthentication()
+                .passwordEncoder(passwordEncoder)
+                .withUser("user").password("$2a$12$51/toL3eG3jGJIkFc5KY8uE537V/zzHsxPKNPDR6dPSrmRG0phOD.").roles("USER");
+        auth
+                .inMemoryAuthentication()
+                .passwordEncoder(passwordEncoder)
+                .withUser("admin").password("$2a$12$51/toL3eG3jGJIkFc5KY8uE537V/zzHsxPKNPDR6dPSrmRG0phOD.").roles("USER","ADMIN");
 
-
-    public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
-
-        private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
-
-        @Override
-        public void onAuthenticationSuccess(HttpServletRequest arg0, HttpServletResponse arg1,
-                                            Authentication authentication) throws IOException, ServletException {
-
-            boolean hasUserRole = false;
-            boolean hasAdminRole = false;
-            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-            for (GrantedAuthority grantedAuthority : authorities) {
-                if (grantedAuthority.getAuthority().equals("ROLE_ADMIN")) {
-                    hasAdminRole = true;
-                    break;
-                } else if (grantedAuthority.getAuthority().equals("ROLE_USER")) {
-                    hasUserRole = true;
-                    break;
-                }
-            }
-            if (hasUserRole) {
-                redirectStrategy.sendRedirect(arg0, arg1, "/user");
-            } else if (hasAdminRole) {
-                redirectStrategy.sendRedirect(arg0, arg1, "/admin");
-            } else {
-                redirectStrategy.sendRedirect(arg0, arg1, "/index");
-            }
-        }
-
+        System.out.println("hello, I have just create few users: \n" +
+                "username: user      password: 123 \n" +
+                "username: admin      password: 123 ");
     }
+
 }
