@@ -3,7 +3,7 @@
 <html lang="en"  xmlns:th="http://thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Users</title>
+    <title>Admin page</title>
 </head>
 
 <form th:method="post" th:action="@{/admin}" th:object="${user}">
@@ -17,6 +17,18 @@
     <label for="email">Email</label>
     <input name="email" type="text" th:field="*{email}" id="email"/>
 
+    <label for="username">Username</label>
+    <input name="username" type="text" th:field="*{username}" id="username"/>
+
+    <label for="password">Password</label>
+    <input name="password" type="password" th:field="*{password}" id="password"/>
+
+
+    <label>Roles: </label>
+    <tr th:each="role : ${listRoles}">
+        <label for="rolesId"></label>
+        <input name="rolesId" type="checkbox" th:text="${role.name}" id="rolesId" th:value="${role.id}"/>
+    </tr>
     <br>
     <input type="submit" value="Add user">
 </form>
@@ -35,6 +47,18 @@
 
     <label for="emailp">Email</label>
     <input name="email" type="text" th:field="*{email}" id="emailp"/>
+    <label for="username">Username</label>
+    <input name="username" type="text" th:field="*{username}" id="usernamep"/>
+
+    <label for="password">Password</label>
+    <input name="password" type="password" th:field="*{password}" id="passwordp"/>
+
+
+    <label>Roles: </label>
+    <tr th:each="role : ${listRoles}">
+        <label for="rolesId"></label>
+        <input name="rolesId" type="checkbox" th:text="${role.name}" id="rolesIdp" th:value="${role.id}"/>
+    </tr>
 
     <br>
     <input type="submit" value="Change user">
@@ -63,7 +87,11 @@
         <td th:text="${user.getName}"></td>
         <td th:text="${user.getSurname}"></td>
         <td th:text="${user.getEmail}"></td>
+        <td th:text="${user.getUsername}"></td>
+        <td th:text="${user.getPassword}"></td>
+        <td th:text="${user.getRoles}"></td>
     </tr>
+
     </tbody>
 </table>
 

@@ -2,6 +2,7 @@ package ru.kata.spring.boot_security.demo.dao;
 
 
 import org.springframework.stereotype.Repository;
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 
 import javax.persistence.*;
@@ -21,10 +22,20 @@ public class UserDaoImpl implements UserDao {
         TypedQuery<User> query = entityManager.createQuery(jpql, User.class);
         return query.getResultList();
     }
+    public List<Role> getAllRoles() {
+        String jpql = "from Role";
+        TypedQuery<Role> query = entityManager.createQuery(jpql, Role.class);
+        return query.getResultList();
+    }
+
 
 
     public void saveUser(User user) {
         entityManager.persist(user);
+
+    }
+    public void saveRole(Role role) {
+        entityManager.persist(role);
 
     }
 
@@ -39,8 +50,8 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User getUserByName(String name) {
-        TypedQuery<User> query = entityManager.createQuery("from User where name = :name", User.class);
-        query.setParameter("name", name);
+        TypedQuery<User> query = entityManager.createQuery("from User where username = :username", User.class);
+        query.setParameter("username", name);
         return query.getSingleResult();
     }
 
@@ -48,7 +59,6 @@ public class UserDaoImpl implements UserDao {
     public void changeUserById(long id, User user) {
         user.setId(id);
         entityManager.merge(user);
-
     }
 
 
